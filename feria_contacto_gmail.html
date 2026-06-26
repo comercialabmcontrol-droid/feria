@@ -318,6 +318,111 @@
       font-weight: 600;
     }
 
+    /* ── INSTRUCCIÓN ANTES DE ABRIR GMAIL ── */
+    .instruction-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .instruction-overlay.show { display: flex; }
+
+    .instruction-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: clamp(32px, 4vw, 56px) clamp(32px, 5vw, 64px);
+      max-width: 560px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .instruction-icon {
+      font-size: clamp(48px, 5vw, 72px);
+      margin-bottom: 12px;
+    }
+
+    .instruction-box h2 {
+      font-size: clamp(22px, 2.2vw, 30px);
+      color: var(--black);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .instruction-box p {
+      font-size: clamp(15px, 1.3vw, 19px);
+      color: var(--gray-text);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .instruction-arrow-demo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: var(--gray-bg);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      font-size: clamp(14px, 1.2vw, 17px);
+      color: var(--black);
+      font-weight: 600;
+      flex-wrap: wrap;
+      text-align: left;
+    }
+
+    .instruction-arrow-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      background: var(--green);
+      color: var(--white);
+      border-radius: 50%;
+      font-size: 22px;
+      box-shadow: 0 4px 14px rgba(46,125,50,0.4);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.12); }
+    }
+
+    .instruction-continue {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 16px 48px;
+      font-size: clamp(16px, 1.4vw, 20px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.12s, transform 0.12s;
+      width: 100%;
+    }
+
+    .instruction-continue:active {
+      transform: scale(0.97);
+    }
+
+    .instruction-continue:hover {
+      filter: brightness(1.1);
+    }
+
     /* ── FOOTER ── */
     .footer {
       font-size: clamp(11px, 0.85vw, 13px);
@@ -399,7 +504,21 @@
 <!-- Overlay -->
 <div class="overlay" id="overlay">
   <div class="spinner"></div>
-  <p>Abriendo correo...</p>
+  <p id="overlayText">Abriendo correo...</p>
+</div>
+
+<!-- Aviso instructivo antes de saltar a Gmail -->
+<div class="instruction-overlay" id="instructionOverlay">
+  <div class="instruction-box">
+    <div class="instruction-icon">✉️</div>
+    <h2>¡Ya casi está!</h2>
+    <p>Se va a abrir tu app de correo con todos los datos rellenados.</p>
+    <div class="instruction-arrow-demo">
+      <span class="instruction-arrow-circle">➤</span>
+      <span>Busca este icono y pulsa para <strong>enviar</strong></span>
+    </div>
+    <button class="instruction-continue" id="instructionContinue">Continuar</button>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -466,46 +585,30 @@
       "\n—\nEnviado desde el formulario de feria."
     );
 
-    mostrarOverlay(true);
-
-    // Intento 1: intent específico de Gmail (solo funciona en Chrome/Android)
-    // Si Gmail está instalado, lo abre directamente. Si no, falla en
-    // silencio y usamos el mailto: normal como respaldo.
-    const gmailIntent =
-      "intent://co?to=" + encodeURIComponent(dest.email) +
-      "&subject=" + asuntoCorreo +
-      "&body=" + cuerpo +
-      "#Intent;scheme=mailto;package=com.google.android.gm;end";
-
     const mailtoLink =
       "mailto:" + dest.email +
       "?subject=" + asuntoCorreo +
       "&body=" + cuerpo;
 
-    setTimeout(() => {
-      mostrarOverlay(false);
+    // Mostramos primero la instrucción visual para que el cliente
+    // sepa qué buscar antes de saltar a la app de correo.
+    mostrarInstruccion(mailtoLink);
+  }
 
-      // Probamos primero el intent de Gmail; si el navegador no
-      // soporta "intent://" (no es Chrome/Android), usamos mailto:
-      try {
-        window.location.href = gmailIntent;
-      } catch (e) {
-        window.location.href = mailtoLink;
-      }
+  function mostrarInstruccion(mailtoLink) {
+    const overlay = document.getElementById('instructionOverlay');
+    const btnContinuar = document.getElementById('instructionContinue');
+    overlay.classList.add('show');
 
-      // Como red de seguridad: si tras un momento seguimos en la
-      // página (el intent falló porque Gmail no está instalado),
-      // probamos con el mailto: genérico.
+    // Al pulsar "Continuar", cerramos el aviso y abrimos la app de correo
+    btnContinuar.onclick = function () {
+      overlay.classList.remove('show');
+      mostrarOverlay(true);
       setTimeout(() => {
+        mostrarOverlay(false);
         window.location.href = mailtoLink;
-      }, 600);
-
-      setTimeout(() => {
-        mostrarToast("Revisa la app de correo y pulsa Enviar para confirmar.", "success");
-        limpiarFormulario();
-      }, 1400);
-
-    }, 500);
+      }, 350);
+    };
   }
 
   function mostrarOverlay(show) {
