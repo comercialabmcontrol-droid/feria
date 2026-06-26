@@ -607,6 +607,12 @@
     btnContinuar.onclick = function () {
       overlay.classList.remove('show');
       mostrarOverlay(true);
+
+      // Limpiamos el formulario AHORA, antes de salir a Gmail.
+      // Así, cuando Fully Kiosk vuelva a mostrar esta pantalla
+      // (sin recargarla), ya estará vacía para el siguiente cliente.
+      limpiarFormulario();
+
       setTimeout(() => {
         mostrarOverlay(false);
         window.location.href = mailtoLink;
@@ -631,6 +637,15 @@
       document.getElementById(id).value = '';
     });
   }
+
+  // Red de seguridad: si la app vuelve a estar visible (el cliente
+  // volvió de Gmail), nos asegura de que el formulario esté limpio,
+  // por si el flujo normal no llegó a ejecutar limpiarFormulario().
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      limpiarFormulario();
+    }
+  });
 
   // Bloqueo de zoom por doble toque
   let lastTap = 0;
