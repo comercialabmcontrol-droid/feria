@@ -158,22 +158,22 @@
     /* ── BOTONES DE ENVÍO ── */
     .send-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
     }
 
     .btn-send {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: clamp(20px, 2.5vw, 36px) clamp(24px, 3vw, 48px);
+      padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.5vw, 22px);
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       cursor: pointer;
       transition: transform 0.12s, filter 0.12s, box-shadow 0.12s;
       text-align: left;
       -webkit-appearance: none;
-      gap: 24px;
+      gap: 10px;
     }
 
     .btn-send:active {
@@ -207,7 +207,7 @@
       flex-shrink: 0;
       background: #ffffff;
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -220,9 +220,9 @@
     }
 
     .btn-logo {
-      height: clamp(40px, 4.5vw, 70px);
+      height: clamp(28px, 3vw, 46px);
       width: auto;
-      max-width: 240px;
+      max-width: 160px;
       object-fit: contain;
       display: block;
     }
@@ -235,13 +235,13 @@
     }
 
     .btn-name {
-      font-size: clamp(17px, 1.8vw, 26px);
+      font-size: clamp(13px, 1.3vw, 19px);
       font-weight: 800;
       line-height: 1.2;
     }
 
     .btn-sub {
-      font-size: clamp(12px, 1.1vw, 17px);
+      font-size: clamp(10px, 0.85vw, 13px);
       font-weight: 400;
     }
 
@@ -251,12 +251,45 @@
     .btn-sub-white   { color: rgba(255,255,255,0.65); }
 
     .btn-arrow {
-      font-size: clamp(20px, 2vw, 30px);
+      font-size: clamp(16px, 1.5vw, 22px);
       flex-shrink: 0;
     }
 
     .btn-arrow-green { color: #2E7D32; }
     .btn-arrow-white { color: rgba(255,255,255,0.65); }
+
+    /* Tercer botón: Enviar a ambas */
+    .btn-ambos {
+      background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #1A1A1A 100%);
+      border: 2.5px solid #1B5E20;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+    }
+
+    .btn-ambos:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+    }
+
+    .btn-ambos .btn-logo-wrap {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+
+    .ambos-logos {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ambos-logos img {
+      height: clamp(18px, 2vw, 30px);
+      width: auto;
+      max-width: 100px;
+      object-fit: contain;
+      display: block;
+    }
 
     /* ── TOAST ── */
     .toast {
@@ -429,6 +462,8 @@
       text-align: center;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init("cWQ4ZJa8Hs64GOPQ_");</script>
 </head>
 <body>
 
@@ -447,11 +482,11 @@
         <input type="text" id="empresa" placeholder="Nombre de empresa o propio" autocomplete="off" autocorrect="off" spellcheck="false">
       </div>
       <div class="field">
-        <label for="telefono">Teléfono</label>
+        <label for="telefono">Teléfono <span class="opcional">(al menos uno)</span></label>
         <input type="tel" id="telefono" placeholder="600 000 000" autocomplete="off">
       </div>
       <div class="field">
-        <label for="email">Correo electrónico</label>
+        <label for="email">Correo electrónico <span class="opcional">(al menos uno)</span></label>
         <input type="email" id="email" placeholder="tu@empresa.com" autocomplete="off" autocorrect="off" autocapitalize="none">
       </div>
     </div>
@@ -492,6 +527,20 @@
         <span class="btn-arrow btn-arrow-white">→</span>
       </button>
 
+      <button class="btn-send btn-ambos" onclick="enviarAmbos()">
+        <div class="btn-logo-wrap btn-logo-wrap btn-ambos .btn-logo-wrap">
+          <div class="ambos-logos">
+            <img src="data:image/png;base64," alt="ABM Control" style="filter: brightness(0) invert(1);">
+            <img src="data:image/jpeg;base64," alt="Quickdoor" style="filter: brightness(0) invert(1);">
+          </div>
+        </div>
+        <div class="btn-text">
+          <span class="btn-name btn-name-white">Enviar a las dos empresas</span>
+          <span class="btn-sub btn-sub-white">ABM Control + Quickdoor</span>
+        </div>
+        <span class="btn-arrow btn-arrow-white">→</span>
+      </button>
+
     </div>
     </div>
   </div>
@@ -503,15 +552,15 @@
 <!-- Overlay -->
 <div class="overlay" id="overlay">
   <div class="spinner"></div>
-  <p id="overlayText">Abriendo correo...</p>
+  <p id="overlayText">Enviando...</p>
 </div>
 
 <!-- Aviso instructivo antes de saltar a Gmail -->
 <div class="instruction-overlay" id="instructionOverlay">
   <div class="instruction-box">
     <div class="instruction-icon">✉️</div>
-    <h2>¡Ya casi está!</h2>
-    <p>Se va a abrir tu app de correo con todos los datos rellenados.</p>
+    <h2 id="instructionTitle">¡Ya casi está!</h2>
+    <p id="instructionDesc">Se va a abrir tu app de correo con todos los datos rellenados.</p>
     <div class="instruction-arrow-demo">
       <span class="instruction-arrow-circle">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
@@ -533,14 +582,18 @@
   // (normalmente Gmail en Android) con todo ya rellenado.
   // El cliente solo tiene que pulsar el icono de "Enviar".
   // ───────────────────────────────────────────────────────────
+  // ── CONFIGURACIÓN EMAILJS ──────────────────────────────────
+  const EMAILJS_SERVICE  = "service_y0bt7gx";
+  const EMAILJS_TEMPLATE = "template_h3c77n9"; // plantilla ABM (y Quickdoor por ahora)
+
   const DESTINOS = {
     abm: {
       nombre: "ABM Control",
-      email:  "comercial@abmcontrol.com"
+      toEmail: "comercial@abmcontrol.com"
     },
     quickdoor: {
       nombre: "Quickdoor",
-      email:  ""  // ← Añadir el email cuando esté disponible
+      toEmail: ""  // ← Añadir el email cuando esté disponible
     }
   };
 
@@ -554,17 +607,44 @@
       document.getElementById('empresa').focus();
       return null;
     }
-    if (!telefono || !/^[\d\s\+\-\(\)]{7,15}$/.test(telefono)) {
-      mostrarToast("Introduce un teléfono válido.", "error");
+
+    // Al menos teléfono O correo deben rellenarse
+    const telefonoValido = telefono && /^[\d\s\+\-\(\)]{7,15}$/.test(telefono);
+    const emailValido    = email    && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!telefonoValido && !emailValido) {
+      mostrarToast("Rellena al menos el teléfono o el correo electrónico.", "error");
       document.getElementById('telefono').focus();
       return null;
     }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      mostrarToast("Introduce un correo electrónico válido.", "error");
+    if (telefono && !telefonoValido) {
+      mostrarToast("El teléfono introducido no es válido.", "error");
+      document.getElementById('telefono').focus();
+      return null;
+    }
+    if (email && !emailValido) {
+      mostrarToast("El correo electrónico introducido no es válido.", "error");
       document.getElementById('email').focus();
       return null;
     }
+
     return { empresa, telefono, email };
+  }
+
+  // Envía el correo via EmailJS a uno o varios destinos
+  async function enviarEmailJS(datos, destinos) {
+    const asuntoTexto = document.getElementById('asunto').value.trim();
+    const promesas = destinos.map(dest =>
+      emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+        to_email:     dest.toEmail,
+        empresa:      datos.empresa,
+        telefono:     datos.telefono || "No indicado",
+        email_cliente: datos.email  || "No indicado",
+        asunto:       asuntoTexto   || "—",
+        destino_nombre: dest.nombre
+      })
+    );
+    return Promise.all(promesas);
   }
 
   function enviar(destino) {
@@ -572,52 +652,68 @@
     if (!datos) return;
 
     const dest = DESTINOS[destino];
-    if (!dest.email) {
+    if (!dest.toEmail) {
       mostrarToast("El correo de " + dest.nombre + " aún no está configurado.", "error");
       return;
     }
 
-    const asuntoTexto = document.getElementById('asunto').value.trim();
-    const asuntoCorreo = encodeURIComponent("[Feria] Nuevo contacto: " + datos.empresa);
-    const cuerpo = encodeURIComponent(
-      "Nuevo contacto desde la feria de exposición:\n\n" +
-      "Empresa / Autónomo: " + datos.empresa + "\n" +
-      "Teléfono: " + datos.telefono + "\n" +
-      "Correo: " + datos.email + "\n" +
-      (asuntoTexto ? "\nInformación de interés:\n" + asuntoTexto + "\n" : "") +
-      "\n—\nEnviado desde el formulario de feria."
-    );
-
-    const mailtoLink =
-      "mailto:" + dest.email +
-      "?subject=" + asuntoCorreo +
-      "&body=" + cuerpo;
-
-    // Mostramos primero la instrucción visual para que el cliente
-    // sepa qué buscar antes de saltar a la app de correo.
-    mostrarInstruccion(mailtoLink);
+    mostrarOverlay(true);
+    enviarEmailJS(datos, [dest])
+      .then(() => {
+        mostrarOverlay(false);
+        mostrarExito(dest.nombre);
+        limpiarFormulario();
+      })
+      .catch(err => {
+        mostrarOverlay(false);
+        mostrarToast("Error al enviar. Comprueba la conexión.", "error");
+        console.error("EmailJS error:", err);
+      });
   }
 
-  function mostrarInstruccion(mailtoLink) {
-    const overlay = document.getElementById('instructionOverlay');
-    const btnContinuar = document.getElementById('instructionContinue');
-    overlay.classList.add('show');
+  function enviarAmbos() {
+    const datos = validar();
+    if (!datos) return;
 
-    // Al pulsar "Continuar", cerramos el aviso y abrimos la app de correo
-    btnContinuar.onclick = function () {
-      overlay.classList.remove('show');
-      mostrarOverlay(true);
+    const activos = Object.values(DESTINOS).filter(d => d.toEmail);
+    if (activos.length === 0) {
+      mostrarToast("Ningún correo destino está configurado todavía.", "error");
+      return;
+    }
 
-      // Limpiamos el formulario AHORA, antes de salir a Gmail.
-      // Así, cuando Fully Kiosk vuelva a mostrar esta pantalla
-      // (sin recargarla), ya estará vacía para el siguiente cliente.
-      limpiarFormulario();
-
-      setTimeout(() => {
+    mostrarOverlay(true);
+    enviarEmailJS(datos, activos)
+      .then(() => {
         mostrarOverlay(false);
-        window.location.href = mailtoLink;
-      }, 350);
-    };
+        mostrarExito(activos.map(d => d.nombre).join(" y "));
+        limpiarFormulario();
+      })
+      .catch(err => {
+        mostrarOverlay(false);
+        mostrarToast("Error al enviar. Comprueba la conexión.", "error");
+        console.error("EmailJS error:", err);
+      });
+  }
+
+  function mostrarExito(nombreDestino) {
+    const overlay = document.getElementById('instructionOverlay');
+    const titulo  = document.getElementById('instructionTitle');
+    const desc    = document.getElementById('instructionDesc');
+    const demo    = document.querySelector('.instruction-arrow-demo');
+    const btn     = document.getElementById('instructionContinue');
+
+    if (titulo) titulo.textContent = "¡Enviado con éxito! ✓";
+    if (desc)   desc.textContent   = "Tu consulta ha sido enviada a " + nombreDestino + ". Nos pondremos en contacto contigo pronto.";
+    if (demo)   demo.style.display = "none";
+    if (btn) {
+      btn.textContent = "Aceptar";
+      btn.onclick = function () {
+        overlay.classList.remove('show');
+        if (demo) demo.style.display = "";
+        btn.textContent = "Continuar";
+      };
+    }
+    overlay.classList.add('show');
   }
 
   function mostrarOverlay(show) {
@@ -644,6 +740,25 @@
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) {
       limpiarFormulario();
+    }
+  });
+
+  // Al pulsar Enter en cualquier campo de texto, cierra el teclado
+  // (quita el foco del campo activo). En el textarea permite salto de línea
+  // solo si el usuario pulsa Shift+Enter; Enter solo cierra el teclado.
+  ['empresa','telefono','email'].forEach(function(id) {
+    document.getElementById(id).addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.blur(); // cierra el teclado en Android
+      }
+    });
+  });
+
+  document.getElementById('asunto').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      this.blur(); // cierra el teclado; Shift+Enter sigue permitiendo salto de línea
     }
   });
 
