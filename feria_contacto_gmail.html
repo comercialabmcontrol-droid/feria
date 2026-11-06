@@ -360,7 +360,7 @@
       font-size: clamp(22px, 2.2vw, 30px);
       color: var(--black);
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 0;
     }
 
     .instruction-box p {
@@ -534,21 +534,11 @@
   <p id="overlayText">Enviando...</p>
 </div>
 
-<!-- Aviso instructivo antes de saltar a Gmail -->
+<!-- Mensaje de éxito (se cierra solo a los 5 segundos) -->
 <div class="instruction-overlay" id="instructionOverlay">
   <div class="instruction-box">
     <div class="instruction-icon">✉️</div>
-    <h2 id="instructionTitle">¡Ya casi está!</h2>
-    <p id="instructionDesc">Se va a abrir tu app de correo con todos los datos rellenados.</p>
-    <div class="instruction-arrow-demo">
-      <span class="instruction-arrow-circle">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="#4285F4"/>
-        </svg>
-      </span>
-      <span>Este icono estará <strong>arriba a la derecha</strong> de la pantalla. Pulsa ahí para <strong>enviar</strong></span>
-    </div>
-    <button class="instruction-continue" id="instructionContinue">Continuar</button>
+    <h2 id="instructionTitle">¡Enviado con éxito! ✓</h2>
   </div>
 </div>
 
@@ -572,7 +562,7 @@
     },
     quickdoor: {
       nombre: "Quickdoor",
-      toEmail: "comercial@quickdoor.es"
+      toEmail: "comercial@a-systematic.com"
     }
   };
 
@@ -650,31 +640,15 @@
       });
   }
 
-  function mostrarExito(nombreDestino) {
+  function mostrarExito() {
     const overlay = document.getElementById('instructionOverlay');
-    const titulo  = document.getElementById('instructionTitle');
-    const desc    = document.getElementById('instructionDesc');
-
-    if (titulo) titulo.textContent = "¡Enviado con éxito! ✓";
-    if (desc)   desc.textContent   = "Tu consulta ha sido enviada a " + nombreDestino + ". Nos pondremos en contacto contigo pronto.";
-
-    // Mostrar y reiniciar la barra de progreso
-    const progress    = document.getElementById('successProgress');
-    const progressBar = document.getElementById('successProgressBar');
-    if (progress) {
-      progress.style.display = 'block';
-      // Reinicia la animación clonando el elemento
-      const newBar = progressBar.cloneNode(true);
-      progressBar.parentNode.replaceChild(newBar, progressBar);
-    }
-
     overlay.classList.add('show');
 
-    // Se cierra automáticamente a los 6 segundos
+    // Se cierra automáticamente a los 5 segundos
     clearTimeout(overlay._timer);
     overlay._timer = setTimeout(() => {
       overlay.classList.remove('show');
-    }, 6000);
+    }, 5000);
   }
 
   function mostrarOverlay(show) {
